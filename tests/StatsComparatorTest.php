@@ -36,7 +36,7 @@ class StatsComparatorTest extends TestCase
         $this->assertGreaterThan(10.0, abs($sesgoFloat), "El sesgo debería ser superior al 10% para activar ALERTA");
     }
 
-    public function testAnalisisContieneEstructuraEsperada(): void
+    public function testAnalysisContainsExpectedStructure(): void
     {
         $comparator = new StatsComparator();
         $analisis = $comparator->analizar([1, 2, 3, 4, 5, 6]);
