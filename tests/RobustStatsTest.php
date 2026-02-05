@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace Cjuol\SymmetricalOcto\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Cjuol\SymmetricalOcto\RobustStats;
 
 class RobustStatsTest extends TestCase
 {
+    private const DELTA = 0.001;
+
     private RobustStats $stats;
     private array $datosReferencia = [87.30, 84.00, 85.40, 78.00, 85.00, 89.00, 79.00, 89.00, 76.00, 86.50];
 
@@ -17,67 +20,75 @@ class RobustStatsTest extends TestCase
         $this->stats = new RobustStats();
     }
 
-    public function testCalculoMediana(): void
+    #[DataProvider('medianaProvider')]
+    public function testCalculoMediana(array $datos, float $esperado): void
     {
-        $this->assertEquals(85.2, $this->stats->getMediana($this->datosReferencia, true));
+        $this->assertEquals($esperado, $this->stats->getMediana($datos));
     }
 
-    public function testCalculoDesviacionRobusta(): void
+    #[DataProvider('desviacionRobustaProvider')]
+    public function testCalculoDesviacionRobusta(array $datos, float $esperado): void
     {
-        $resultado = $this->stats->getDesviacionRobusta($this->datosReferencia, true);
+        $resultado = $this->stats->getDesviacionRobusta($datos);
         // Usamos delta para permitir pequeñas variaciones de decimales
-        $this->assertEqualsWithDelta(2.01, $resultado, 0.05);
+        $this->assertEqualsWithDelta($esperado, $resultado, self::DELTA);
     }
 
     public function testCalculoCVr(): void
     {
-        $resultado = $this->stats->getCVr($this->datosReferencia, true);
-        $this->assertEqualsWithDelta(2.35, $resultado, 0.05);
+        $resultado = $this->stats->getCVr($this->datosReferencia);
+        $this->assertEqualsWithDelta(2.354112542617955, $resultado, self::DELTA);
+    }
+
+    public function testCalculoCVConMedianaCero(): void
+    {
+        $resultado = $this->stats->getCV([0, 0, 0]);
+        $this->assertSame(0.0, $resultado);
     }
 
     public function testIntervalosConfianza(): void
     {
-        $ic = $this->stats->getIntervalosConfianza($this->datosReferencia, true);
-        $this->assertEqualsWithDelta(89.13, $ic['superior'], 0.1);
-        $this->assertEqualsWithDelta(81.27, $ic['inferior'], 0.1);
+        $ic = $this->stats->getIntervalosConfianza($this->datosReferencia);
+        $this->assertEqualsWithDelta(89.13117961716858, $ic['superior'], self::DELTA);
+        $this->assertEqualsWithDelta(81.26882038283142, $ic['inferior'], self::DELTA);
     }
 
     public function testCalculoMedia(): void
     {
-        $resultado = $this->stats->getMedia($this->datosReferencia, true);
-        $this->assertEqualsWithDelta(83.92, $resultado, 0.05);
+        $resultado = $this->stats->getMedia($this->datosReferencia);
+        $this->assertEqualsWithDelta(83.92, $resultado, self::DELTA);
     }
 
     public function testCalculoVarianzaRobusta(): void
     {
-        $resultado = $this->stats->getVarianzaRobusta($this->datosReferencia, true);
+        $resultado = $this->stats->getVarianzaRobusta($this->datosReferencia);
         // Varianza robusta = S*²
-        $this->assertEqualsWithDelta(4.04, $resultado, 0.1);
+        $this->assertEqualsWithDelta(4.022848079561035, $resultado, self::DELTA);
     }
 
     public function testCalculoIQR(): void
     {
-        $resultado = $this->stats->getIQR($this->datosReferencia, true);
+        $resultado = $this->stats->getIQR($this->datosReferencia);
         // IQR = Q3 - Q1
-        $this->assertEqualsWithDelta(6.85, $resultado, 0.1);
+        $this->assertEqualsWithDelta(6.85, $resultado, self::DELTA);
     }
 
     public function testCalculoMAD(): void
     {
-        $resultado = $this->stats->getMAD($this->datosReferencia, true);
+        $resultado = $this->stats->getMAD($this->datosReferencia);
         // MAD = Desviación Absoluta de la Mediana
-        $this->assertEqualsWithDelta(2.95, $resultado, 0.1);
+        $this->assertEqualsWithDelta(2.95, $resultado, self::DELTA);
     }
 
     public function testDeteccionOutliers(): void
     {
         // Con los datos de referencia no hay outliers
-        $outliers = $this->stats->getOutliers($this->datosReferencia, true);
+        $outliers = $this->stats->getOutliers($this->datosReferencia);
         $this->assertEmpty($outliers);
 
         // Probamos con datos que contienen outliers
         $datosConOutliers = [1, 2, 3, 4, 5, 100]; // 100 es un outlier claro
-        $outliersDetectados = $this->stats->getOutliers($datosConOutliers, true);
+        $outliersDetectados = $this->stats->getOutliers($datosConOutliers);
         $this->assertNotEmpty($outliersDetectados);
         $this->assertContains(100, $outliersDetectados);
     }
@@ -98,33 +109,48 @@ class RobustStatsTest extends TestCase
         $this->assertArrayHasKey('intervalosConfianza', $resumen);
 
         // Validamos algunos valores
-        $this->assertEqualsWithDelta(83.92, $resumen['media'], 0.05);
+        $this->assertEqualsWithDelta(83.92, $resumen['media'], self::DELTA);
         $this->assertEquals(85.2, $resumen['mediana']);
-        $this->assertEqualsWithDelta(2.01, $resumen['desviacionRobusta'], 0.05);
+        $this->assertEqualsWithDelta(2.01, $resumen['desviacionRobusta'], self::DELTA);
         $this->assertIsArray($resumen['intervalosConfianza']);
         $this->assertIsArray($resumen['outliers']);
     }
 
-    public function testValidacionDatos(): void
+    public function testCVrConMedianaCero(): void
     {
-        // Test con menos de 2 valores
-        $this->expectException(\InvalidArgumentException::class);
-        $this->stats->getMedia([1], true);
+        $datos = [-1, 0, 1, 0];
+        $resultado = $this->stats->getCVr($datos);
+        $this->assertSame(0.0, $resultado);
     }
 
-    public function testValidacionDatosNoNumericos(): void
+    #[DataProvider('validacionProvider')]
+    public function testValidacionDatos(array $datos): void
     {
-        // Test con valores no numéricos
         $this->expectException(\InvalidArgumentException::class);
-        $this->stats->getMedia([1, 'abc', 3], true);
+        $this->stats->getMedia($datos);
     }
 
-    public function testSinOrdenamiento(): void
+    public static function medianaProvider(): array
     {
-        // Probamos que funciona correctamente sin ordenar datos
-        $datosDesordenados = [85.00, 87.30, 78.00, 89.00];
-        $resultado = $this->stats->getMediana($datosDesordenados, false);
-        // La mediana sin ordenar de [85.00, 87.30, 78.00, 89.00] sería (87.30 + 78.00) / 2 = 82.65
-        $this->assertEqualsWithDelta(82.65, $resultado, 0.05);
+        return [
+            'datos_referencia' => [[87.30, 84.00, 85.40, 78.00, 85.00, 89.00, 79.00, 89.00, 76.00, 86.50], 85.2],
+            'negativos' => [[-9, -7, -5, -3], -6.0],
+        ];
+    }
+
+    public static function desviacionRobustaProvider(): array
+    {
+        return [
+            'datos_referencia' => [[87.30, 84.00, 85.40, 78.00, 85.00, 89.00, 79.00, 89.00, 76.00, 86.50], 2.005703886310498],
+            'negativos' => [[-9, -7, -5, -3], 1.388888888888889],
+        ];
+    }
+
+    public static function validacionProvider(): array
+    {
+        return [
+            'menos_de_dos' => [[1]],
+            'no_numericos' => [[1, 'abc', 3]],
+        ];
     }
 }
