@@ -55,7 +55,8 @@ class RobustStats implements StatsInterface
 
     public function getVarianzaRobusta(array $datos): float
     {
-        return pow($this->getDesviacionRobusta($datos), 2);
+        $datosPreparados = $this->prepararDatos($datos, true);
+        return pow($this->calcularDesviacionRobusta($datosPreparados), 2);
     }
 
     public function getIQR(array $datos): float
