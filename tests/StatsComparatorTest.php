@@ -10,7 +10,6 @@ use Cjuol\SymmetricalOcto\StatsComparator;
 
 class StatsComparatorTest extends TestCase
 {
-    private const DELTA = 0.001;
 
     #[DataProvider('veredictoProvider')]
     public function testAnalisisVeredicto(array $datos, string $fragmentoEsperado): void
