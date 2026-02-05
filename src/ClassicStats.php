@@ -6,6 +6,7 @@ namespace Cjuol\SymmetricalOcto;
 
 use Cjuol\SymmetricalOcto\Contracts\StatsInterface;
 use Cjuol\SymmetricalOcto\Traits\DataProcessorTrait;
+use Cjuol\SymmetricalOcto\Traits\ExportableTrait;
 
 /**
  * ClassicStats - Biblioteca de Estadística Descriptiva Clásica
@@ -15,6 +16,7 @@ use Cjuol\SymmetricalOcto\Traits\DataProcessorTrait;
 class ClassicStats implements StatsInterface
 {
     use DataProcessorTrait;
+    use ExportableTrait;
 
     // ========== FUNCIONES PÚBLICAS - INTERFAZ Y CONTRATOS ==========
 
@@ -81,7 +83,6 @@ class ClassicStats implements StatsInterface
 
     /**
      * Detecta outliers usando el método Z-Score tradicional (|Z| > 3).
-     * Nota: Este método es menos efectivo que Tukey en presencia de muchos outliers.
      */
     public function getOutliers(array $datos): array
     {
@@ -89,7 +90,7 @@ class ClassicStats implements StatsInterface
         $media = $this->calcularMedia($d);
         $desviacion = $this->getDesviacionEstandar($d);
 
-        if ($desviacion === 0.0) return [];
+        if ($desviacion < 1e-9) return [];
 
         return array_values(array_filter($d, function ($x) use ($media, $desviacion) {
             return abs(($x - $media) / $desviacion) > 3;
@@ -102,15 +103,14 @@ class ClassicStats implements StatsInterface
     public function obtenerResumen(array $datos, bool $ordenar = true, int $decimales = 2): array
     {
         $d = $this->prepararDatos($datos, $ordenar);
-        $media = $this->calcularMedia($d);
-        $varMuestral = $this->calcularVarianza($d, true);
 
         return [
-            'media'              => round($media, $decimales),
+            'media'              => round($this->calcularMedia($d), $decimales),
             'mediana'            => round($this->calcularMediana($d), $decimales),
-            'desviacionEstandar' => round(sqrt($varMuestral), $decimales),
-            'varianzaMuestral'   => round($varMuestral, $decimales),
-            'CV'                 => round(($this->getDesviacionEstandar($d) / abs($media)) * 100, $decimales),
+            'desviacionEstandar' => round($this->getDesviacionEstandar($d), $decimales),
+            'varianzaMuestral'   => round($this->getVarianzaMuestral($d), $decimales),
+            // USAMOS EL MÉTODO SEGURO getCV($d) para evitar división por cero
+            'CV'                 => round($this->getCV($d), $decimales),
             'outliers_zscore'    => $this->getOutliers($d),
             'count'              => count($d)
         ];
@@ -134,10 +134,6 @@ class ClassicStats implements StatsInterface
         return (float) $datos[$m];
     }
 
-    /**
-     * Calcula la varianza.
-     * @param bool $muestral Si true usa n-1, si false usa n.
-     */
     private function calcularVarianza(array $datos, bool $muestral = true): float
     {
         $n = count($datos);

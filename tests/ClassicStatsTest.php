@@ -88,6 +88,39 @@ class ClassicStatsTest extends TestCase
         $this->assertEquals(10, $resumen['count']);
     }
 
+    public function testExportJsonCoincideConResumen(): void
+    {
+        $json = $this->stats->toJson($this->datosReferencia);
+        $this->assertJson($json);
+
+        $decoded = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
+        $this->assertEquals($this->stats->obtenerResumen($this->datosReferencia), $decoded);
+    }
+
+    public function testExportCsvCoincideConResumen(): void
+    {
+        $csv = $this->stats->toCsv($this->datosReferencia);
+        $lineas = preg_split('/\r?\n/', trim($csv));
+
+        $this->assertCount(2, $lineas);
+
+        $cabeceras = str_getcsv($lineas[0], ',');
+        $valores = str_getcsv($lineas[1], ',');
+
+        $resumen = $this->stats->obtenerResumen($this->datosReferencia);
+        $esperado = [];
+        foreach ($resumen as $key => $value) {
+            if (is_array($value)) {
+                $esperado[$key] = empty($value) ? '' : implode('|', $value);
+            } else {
+                $esperado[$key] = (string) $value;
+            }
+        }
+
+        $this->assertSame(array_keys($esperado), $cabeceras);
+        $this->assertSame(array_values($esperado), $valores);
+    }
+
     #[DataProvider('validacionProvider')]
     public function testValidacionDatos(array $datos): void
     {
