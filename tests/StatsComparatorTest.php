@@ -21,7 +21,7 @@ class StatsComparatorTest extends TestCase
         $this->assertStringContainsString($fragmentoEsperado, $analisis['veredicto']);
     }
 
-    public function testAnalisisDetectaSesgoAlto(): void
+    public function testAnalysisDetectsHighBias(): void
     {
         $comparator = new StatsComparator();
         $datosSucios = [10, 10, 11, 12, 10, 500];
