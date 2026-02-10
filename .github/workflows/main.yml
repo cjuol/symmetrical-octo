@@ -7,6 +7,8 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      R_LIBS_USER: ${{ github.workspace }}/.r-lib
 
     steps:
       - name: Checkout code
@@ -20,10 +22,22 @@ jobs:
           coverage: none
           tools: composer:v2
 
+      - name: Cache R packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            .r-lib
+            ~/.cache/R
+          key: ${{ runner.os }}-r-${{ hashFiles('tests/verify_means.R') }}
+          restore-keys: |
+            ${{ runner.os }}-r-
+
       - name: Install R and packages
         run: |
           sudo apt-get update
-          sudo apt-get install -y r-base r-cran-mass r-cran-desctools
+          sudo apt-get install -y r-base r-cran-mass
+          mkdir -p "$R_LIBS_USER"
+          R -q -e "install.packages('DescTools', repos='https://cloud.r-project.org')"
 
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress
