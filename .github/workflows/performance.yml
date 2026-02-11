@@ -11,14 +11,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Build benchmark image
-        run: docker compose build benchmark
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          tools: composer
 
       - name: Install PHP dependencies
-        run: docker compose run --rm web composer install --no-interaction --no-progress --prefer-dist
+        run: composer install --no-interaction --no-progress --prefer-dist
 
       - name: Run benchmark (JSON)
-        run: docker compose --profile performance run --rm benchmark json
+        run: php tests/BenchmarkStatGuard.php json
 
       - name: Publish shield.json to Gist
         uses: exuanbo/actions-deploy-gist@v1

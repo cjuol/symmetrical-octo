@@ -100,9 +100,9 @@ function measure(string $label, callable $fn): array {
     ];
 }
 
-function buildShieldData(array $results, int $size): array {
-    $statGuardLabel = "median: RobustStats ($size)";
-    $mathPhpLabel = "median: MathPHP ($size)";
+function buildShieldData(array $results): array {
+    $statGuardLabel = 'median: StatGuard (100000)';
+    $mathPhpLabel = 'median: MathPHP (100000)';
     $statGuardMs = null;
     $mathPhpMs = null;
 
@@ -117,8 +117,8 @@ function buildShieldData(array $results, int $size): array {
 
     $message = 'n/a';
     if ($statGuardMs !== null && $mathPhpMs !== null && $statGuardMs > 0) {
-        $ratio = $mathPhpMs / $statGuardMs;
-        $message = sprintf('%.1fh faster than MathPHP', $ratio);
+        $ratio = round($mathPhpMs / $statGuardMs, 1);
+        $message = $ratio . 'x faster than MathPHP';
     }
 
     return [
@@ -146,7 +146,7 @@ foreach ($sizes as $size) {
     }
 
     /** SECCIÓN: MEDIANA */
-    $resMedian = measure("median: RobustStats ($size)", fn() => $stats->getMedian($data));
+    $resMedian = measure("median: StatGuard ($size)", fn() => $stats->getMedian($data));
     $resMedian['r_ms'] = $rBench['median_ms'] ?? null;
     
     $results[] = $resMedian;
@@ -183,7 +183,7 @@ foreach ($sizes as $size) {
 // --- 6. RENDERIZADO DE RESULTADOS ---
 
 if ($format === 'json') {
-    $shieldData = buildShieldData($results, 100000);
+    $shieldData = buildShieldData($results);
     file_put_contents(
         'statguard-perf.json',
         json_encode($shieldData, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)

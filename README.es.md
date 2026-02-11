@@ -4,7 +4,7 @@
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/cjuol/statguard.svg?style=flat-square)](https://packagist.org/packages/cjuol/statguard)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE)
 [![PHP Tests](https://github.com/cjuol/statguard/actions/workflows/php-tests.yml/badge.svg)](https://github.com/cjuol/statguard/actions)
-[![Performance](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/cjuol/414f8bf15fbe9503c332a5c0a57a699f/raw/shield.json)](https://gist.github.com/cjuol/414f8bf15fbe9503c332a5c0a57a699f)
+[![Performance](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/cjuol/414f8bf15fbe9503c332a5c0a57a699f/raw/statguard-perf.json)](https://gist.github.com/cjuol/414f8bf15fbe9503c332a5c0a57a699f)
 [![R-Compatibility](https://img.shields.io/badge/R-compatibility-blue?style=flat-square)](https://cran.r-project.org/)
 [![PHP 8.x](https://img.shields.io/badge/PHP-8.x-777BB4?style=flat-square)](https://www.php.net/)
 
@@ -238,7 +238,7 @@ composer run test
 composer run validate-r
 ```
 
-## Benchmarks de Rendimiento (StatGuard vs R)
+## Benchmarks de Rendimiento (StatGuard vs MathPHP vs R)
 
 Hasta 5x mas rapido que MathPHP en calculos de mediana.
 
@@ -246,11 +246,11 @@ Hasta 5x mas rapido que MathPHP en calculos de mediana.
 
 Dataset: 100000 floats aleatorios. Benchmarks ejecutados en el perfil performance con `docker compose --profile performance run --rm benchmark json`. Los tiempos de R usan `system.time()` y miden solo computacion (carga del archivo excluida).
 
-| Metrica (100k) | StatGuard ms | R ms | Relación (PHP/R) | RAM Pico (MB) |
+| Metrica (100k) | StatGuard ms | MathPHP ms | R ms | Relación (PHP/R) |
 | :--- | ---: | ---: | ---: | ---: |
-| Mediana | 15.85 | 2.00 | 7.92 | 7.00 |
-| Cuantil Tipo 7 (p=0.75) | 16.19 | 2.00 | 8.09 | 0.00 |
-| Media de Huber | 34.76 | 10.00 | 3.48 | 2.00 |
+| Mediana | 15.8 | 76.5 | 2.00 | 7.92 |
+| Cuantil Tipo 7 (p=0.75) | 16.2 | 16.0 | 2.00 | 8.09 |
+| Media de Huber | 34.8 | 788.7 | 10.00 | 3.48 |
 
 Chequeo de precision (Huber): $\Delta = 0.0056111266$ para $n = 100000$ (umbral de aviso $10^{-10}$). En datasets mas pequenos se observan deltas mayores y el benchmark los reporta como warnings.
 
