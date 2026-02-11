@@ -42,3 +42,11 @@ La interpolacion lineal se aplica entre $x_{(j)}$ y $x_{(j+1)}$ cuando $p$ cae e
 
 !!! success
 	Los cuantiles tipo 7 son el comportamiento por defecto de R y el mas comun en analisis exploratorio.
+
+## Benchmark (100,000 elementos)
+
+| Metrica (100k) | StatGuard (ms) | MathPHP (ms) | R (ms) | Relacion (PHP/R) |
+| :--- | ---: | ---: | ---: | ---: |
+| Mediana | 15.85 | 76.55 | 2.00 | 7.92 |
+| Cuantil tipo 7 (p=0.75) | 16.19 | 16.03 | 2.00 | 8.09 |
+| Media de Huber | 34.76 | 788.71 | 10.00 | 3.48 |

@@ -185,7 +185,7 @@ foreach ($sizes as $size) {
 if ($format === 'json') {
     $shieldData = buildShieldData($results, 100000);
     file_put_contents(
-        'shield.json',
+        'statguard-perf.json',
         json_encode($shieldData, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
     );
 

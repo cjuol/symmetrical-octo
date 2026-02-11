@@ -25,5 +25,5 @@ jobs:
         with:
           gist_id: ${{ secrets.GIST_ID }}
           gist_token: ${{ secrets.GIST_TOKEN }}
-          gist_file_name: shield.json
-          file_path: shield.json
+          gist_file_name: statguard-perf.json
+          file_path: statguard-perf.json

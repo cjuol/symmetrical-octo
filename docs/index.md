@@ -10,6 +10,14 @@ StatGuard es el motor estadistico mas rapido para PHP en analisis robusto, enfoc
 !!! info
 	Incluye cuantiles compatibles con R, estimadores robustos (Huber, MAD, IQR) y exportaciones listas para auditoria.
 
+## Benchmark (100,000 elementos)
+
+| Metrica (100k) | StatGuard (ms) | MathPHP (ms) | R (ms) | Relacion (PHP/R) |
+| :--- | ---: | ---: | ---: | ---: |
+| Mediana | 15.85 | 76.55 | 2.00 | 7.92 |
+| Cuantil tipo 7 (p=0.75) | 16.19 | 16.03 | 2.00 | 8.09 |
+| Media de Huber | 34.76 | 788.71 | 10.00 | 3.48 |
+
 ## Quick Start
 
 ```php
