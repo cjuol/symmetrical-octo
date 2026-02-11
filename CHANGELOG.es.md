@@ -12,11 +12,12 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.
 - Suite de benchmarks de rendimiento (StatGuard vs R vs MathPHP) con ratios.
 - Script de rendimiento en R para mediana, cuantil tipo 7 y media de Huber.
 - Perfil performance en Docker Compose para ejecuciones reproducibles.
+- Workflow de GitHub Actions para la medalla dinamica de rendimiento.
 - Certificacion de rendimiento y paridad con R para v1.1.0.
 - Suite de benchmarking integrada con MathPHP y R.
 - Documentacion bilingue con soporte MkDocs y GitHub Pages.
 
-### Changed
+### Cambiado
 - El benchmark ahora incluye tiempos de R y warnings de precision para paridad de Huber.
 
 ## [1.0.0] - 2026-02-11
@@ -37,3 +38,5 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.
 
 ### Fixed
 - N/A (lanzamiento inicial).
+
+Built with ❤️ by cjuol.

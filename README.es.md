@@ -4,12 +4,13 @@
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/cjuol/statguard.svg?style=flat-square)](https://packagist.org/packages/cjuol/statguard)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE)
 [![PHP Tests](https://github.com/cjuol/statguard/actions/workflows/php-tests.yml/badge.svg)](https://github.com/cjuol/statguard/actions)
+[![Performance](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/cjuol/a1b2c3d4e5f6g7h8/raw/shield.json)](https://gist.github.com/cjuol/414f8bf15fbe9503c332a5c0a57a699f)
 [![R-Compatibility](https://img.shields.io/badge/R-compatibility-blue?style=flat-square)](https://cran.r-project.org/)
 [![PHP 8.x](https://img.shields.io/badge/PHP-8.x-777BB4?style=flat-square)](https://www.php.net/)
 
 StatGuard es una suite de analisis estadistico robusto para PHP enfocada en precision cientifica e integridad de datos. Compara estadistica clasica contra estadistica robusta para detectar sesgo, ruido y anomalias de medicion de forma automatica.
 
-## Por que StatGuard
+## ¿Por qué StatGuard?
 
 Los valores atipicos son inevitables en telemetria, finanzas, deporte y laboratorios. Un solo valor extremo puede arrastrar la media aritmetica lejos de la masa central y sesgar las decisiones. StatGuard ofrece estimadores robustos (mediana, MAD, medias recortadas y winsorizadas, estimador M de Huber) que se mantienen estables bajo contaminacion, permitiendo confiar en los resumenes aun con datos ruidosos.
 
@@ -245,7 +246,7 @@ Hasta 5x mas rapido que MathPHP en calculos de mediana.
 
 Dataset: 100000 floats aleatorios. Benchmarks ejecutados en el perfil performance con `docker compose --profile performance run --rm benchmark json`. Los tiempos de R usan `system.time()` y miden solo computacion (carga del archivo excluida).
 
-| Metrica (100k) | StatGuard ms | R ms | Ratio (PHP/R) | RAM Pico (MB) |
+| Metrica (100k) | StatGuard ms | R ms | Relación (PHP/R) | RAM Pico (MB) |
 | :--- | ---: | ---: | ---: | ---: |
 | Mediana | 15.85 | 2.00 | 7.92 | 7.00 |
 | Cuantil Tipo 7 (p=0.75) | 16.19 | 2.00 | 8.09 | 0.00 |

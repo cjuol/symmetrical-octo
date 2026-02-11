@@ -1,4 +1,5 @@
 # Rendimiento
+[English](../README.md) | [Español]
 
 ## Hallazgos clave
 
@@ -12,13 +13,13 @@ StatGuard se compara contra MathPHP y R para medir consistencia numerica y tiemp
 
 Resultados reales del ultimo benchmark en el perfil `performance`:
 
-| Metrica (100k) | StatGuard (ms) | MathPHP (ms) | R (ms) | Efficiency Ratio (PHP/R) |
+| Metrica (100k) | StatGuard (ms) | MathPHP (ms) | R (ms) | Relación (PHP/R) |
 | :--- | ---: | ---: | ---: | ---: |
 | Mediana | 15.85 | 76.55 | 2.00 | 7.92 |
 | Cuantil tipo 7 (p=0.75) | 16.19 | 16.03 | 2.00 | 8.09 |
 | Media de Huber | 34.76 | 788.71 | 10.00 | 3.48 |
 
-**Efficiency Ratio** = $\text{StatGuard ms} / \text{R ms}$. En mediana y cuantiles el ratio es ~8x, lo que indica que StatGuard es varias veces mas rapido que el core de R en este perfil controlado.
+**Relación (PHP/R)** = $\text{StatGuard ms} / \text{R ms}$. En mediana y cuantiles el ratio es ~8x, lo que indica que StatGuard es varias veces mas rapido que el core de R en este perfil controlado.
 
 !!! info
 	**Precision warnings**: La diferencia de Huber $\Delta = 0.0056111266$ es marginal y se debe a criterios de convergencia iterativa distintos entre PHP y R. No afecta la interpretacion estadistica en el rango de datos (0-1000).
@@ -26,8 +27,10 @@ Resultados reales del ultimo benchmark en el perfil `performance`:
 ## Como ejecutar
 
 ```bash
-docker compose --profile performance run benchmark
+docker compose --profile performance run --rm benchmark json
 ```
 
 !!! info
 	Recomendado ejecutar en un entorno estable y con JIT habilitado para obtener resultados comparables.
+
+Built with ❤️ by cjuol.

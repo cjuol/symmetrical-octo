@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Performance benchmark suite (StatGuard vs R vs MathPHP) with ratio reporting.
 - R performance script for median, quantile type 7, and Huber mean.
 - Performance profile in Docker Compose for repeatable benchmark runs.
+- GitHub Actions workflow for the dynamic performance badge.
 - Performance certification and R parity reporting for v1.1.0.
 - Integrated MathPHP & R benchmarking suite.
 - Bilingual documentation with MkDocs & GitHub Pages support.
@@ -37,3 +38,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - N/A (initial release).
+
+Built with ❤️ by cjuol.
