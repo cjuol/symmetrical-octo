@@ -1,0 +1,29 @@
+name: Performance Badge
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build benchmark image
+        run: docker compose build benchmark
+
+      - name: Install PHP dependencies
+        run: docker compose run --rm web composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Run benchmark (JSON)
+        run: docker compose --profile performance run --rm benchmark json
+
+      - name: Publish shield.json to Gist
+        uses: exuanbo/actions-deploy-gist@v1
+        with:
+          gist_id: ${{ secrets.GIST_ID }}
+          gist_token: ${{ secrets.GIST_TOKEN }}
+          gist_file_name: shield.json
+          file_path: shield.json

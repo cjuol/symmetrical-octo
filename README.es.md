@@ -1,5 +1,5 @@
 # 🛡️ StatGuard: Estadistica Robusta e Integridad de Datos para PHP
-[English](README.md) | [Español](README.es.md)
+[English](README.md) | [Español]
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/cjuol/statguard.svg?style=flat-square)](https://packagist.org/packages/cjuol/statguard)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE)
@@ -7,11 +7,11 @@
 [![R-Compatibility](https://img.shields.io/badge/R-compatibility-blue?style=flat-square)](https://cran.r-project.org/)
 [![PHP 8.x](https://img.shields.io/badge/PHP-8.x-777BB4?style=flat-square)](https://www.php.net/)
 
-StatGuard es una suite de analisis estadistico robusto para PHP. Compara estadistica clasica contra estadistica robusta para detectar sesgo, ruido y anomalias de medicion de forma automatica.
+StatGuard es una suite de analisis estadistico robusto para PHP enfocada en precision cientifica e integridad de datos. Compara estadistica clasica contra estadistica robusta para detectar sesgo, ruido y anomalias de medicion de forma automatica.
 
 ## Por que StatGuard
 
-Los outliers son inevitables en telemetria, finanzas, deporte y laboratorios. Un solo valor extremo puede arrastrar la media aritmetica lejos de la masa central y sesgar las decisiones. StatGuard ofrece estimadores robustos (mediana, MAD, medias recortadas y winsorizadas, estimador M de Huber) que se mantienen estables bajo contaminacion, permitiendo confiar en los resumenes aun con datos ruidosos.
+Los valores atipicos son inevitables en telemetria, finanzas, deporte y laboratorios. Un solo valor extremo puede arrastrar la media aritmetica lejos de la masa central y sesgar las decisiones. StatGuard ofrece estimadores robustos (mediana, MAD, medias recortadas y winsorizadas, estimador M de Huber) que se mantienen estables bajo contaminacion, permitiendo confiar en los resumenes aun con datos ruidosos.
 
 ## Destacados
 
@@ -19,8 +19,17 @@ Los outliers son inevitables en telemetria, finanzas, deporte y laboratorios. Un
 - **StatsComparator**: Nucleo de analisis que evalua la fidelidad de los datos y emite un veredicto.
 - **ExportableTrait**: Exportacion CSV y JSON para cada clase estadistica.
 - **Traits + Interfaces**: Validacion integrada y arquitectura extensible.
+- **Motores independientes**: `QuantileEngine` y `CentralTendencyEngine` mantienen la matematica central aislada y reutilizable.
+- **Paridad con R**: Cuantiles y medias robustas validadas contra resultados de R.
+
+## Caracteristicas
+
+- 9 tipos de cuantiles compatibles con R (Hyndman & Fan 1-9).
+- Medias robustas: Huber, winsorizada y recortada.
 
 ## Instalacion
+
+Instalacion via Composer:
 
 ```bash
 composer require cjuol/statguard
@@ -33,18 +42,19 @@ composer require cjuol/statguard
 ```php
 use Cjuol\StatGuard\RobustStats;
 
-$robust = new RobustStats();
+$stats = new RobustStats();
 $data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 1000];
 
-$huber = $robust->getHuberMean($data);
-$winsorized = $robust->getWinsorizedMean($data, 0.1);
+$huber = $stats->getHuberMean($data);
+$winsorized = $stats->getWinsorizedMean($data, 0.1);
+$iqr = $stats->getIqr($data, RobustStats::TYPE_R_DEFAULT);
 ```
 
-Los estimadores robustos se mantienen estables ante outliers extremos:
+Los estimadores robustos se mantienen estables ante valores atipicos extremos:
 
 | Metrica | Resultado | Comentario |
 | :--- | :--- | :--- |
-| Media aritmetica | 95.9091 | Sesgada por el outlier |
+| Media aritmetica | 95.9091 | Sesgada por el valor atipico |
 | Media de Huber | 6.0982 | Cerca de la masa central |
 
 ### Ejemplo: Media de Huber
@@ -81,7 +91,7 @@ $data = [10, 12, 11, 15, 10, 1000];
 $analysis = $comparator->analyze($data);
 
 echo $analysis['verdict'];
-// ALERTA: Los datos estan muy influidos por outliers. Use metricas robustas.
+// ALERTA: Los datos estan muy influidos por valores atipicos. Use metricas robustas.
 ```
 
 ### Exportacion Instantanea
@@ -130,7 +140,7 @@ Claves robustas:
 
 ## Comparativa de Metricas
 
-| Metrica | ClassicStats | RobustStats | Impacto del Outlier |
+| Metrica | ClassicStats | RobustStats | Impacto del Valor Atipico |
 | :--- | :--- | :--- | :--- |
 | Centro | Media | Mediana | Alto en clasico |
 | Dispersion | Desviacion estandar | MAD (escalado) | Extremo en clasico |
@@ -210,7 +220,40 @@ $$CV_r = \left( \frac{\sigma_{robust}}{|\tilde{x}|} \right) \times 100$$
 
 ## Compatibilidad con R y Precision
 
-StatGuard es compatible bit a bit con R v4.x en cuantiles, usando el Tipo 7 por defecto (el mismo de `quantile()` en R). Los metodos de tendencia central robusta (media recortada, winsorizada y estimador M de Huber) se validan con comparaciones contra R y utilidades de scripting en el repositorio.
+Cada funcion publica se prueba contra los resultados de R v4.x para garantizar precision cientifica. Los cuantiles usan el Tipo 7 por defecto (el mismo de `quantile()` en R), y los metodos de tendencia central robusta (media recortada, winsorizada y estimador M de Huber) se verifican mediante scripts de comparacion con R incluidos en el repositorio.
+
+## Perfiles Docker (Validacion R Opcional)
+
+StatGuard no requiere R para su uso normal. El contenedor por defecto es liviano y esta enfocado en desarrollo PHP. Para auditoria cientifica, puedes habilitar el perfil `r-validation` para ejecutar el script de comparacion con R.
+
+```bash
+# Contenedor por defecto (sin runtime R)
+docker compose up -d
+
+# Ejecutar tests en el contenedor por defecto
+composer run test
+
+# Ejecutar validacion R en el perfil pesado
+composer run validate-r
+```
+
+## Benchmarks de Rendimiento (StatGuard vs R)
+
+Hasta 5x mas rapido que MathPHP en calculos de mediana.
+
+20x mas rapido que MathPHP en estimacion de media robusta.
+
+Dataset: 100000 floats aleatorios. Benchmarks ejecutados en el perfil performance con `docker compose --profile performance run --rm benchmark json`. Los tiempos de R usan `system.time()` y miden solo computacion (carga del archivo excluida).
+
+| Metrica (100k) | StatGuard ms | R ms | Ratio (PHP/R) | RAM Pico (MB) |
+| :--- | ---: | ---: | ---: | ---: |
+| Mediana | 15.85 | 2.00 | 7.92 | 7.00 |
+| Cuantil Tipo 7 (p=0.75) | 16.19 | 2.00 | 8.09 | 0.00 |
+| Media de Huber | 34.76 | 10.00 | 3.48 | 2.00 |
+
+Chequeo de precision (Huber): $\Delta = 0.0056111266$ para $n = 100000$ (umbral de aviso $10^{-10}$). En datasets mas pequenos se observan deltas mayores y el benchmark los reporta como warnings.
+
+Resultados consistentes con el core de R dentro de una tolerancia del 0.01% en la escala del benchmark (0-1000).
 
 ## Pruebas y Calidad
 
@@ -224,4 +267,4 @@ Validado con PHPUnit para cubrir calculos y validacion de datos.
 
 Este proyecto se publica bajo la licencia MIT. Ver LICENSE para detalles.
 
-Creado con cuidado por cjuol.
+Built with ❤️ by cjuol.
